@@ -5,5 +5,4 @@ Route
     status: 201,
     message: 'OK'
   }))
-
 module.exports = Route
