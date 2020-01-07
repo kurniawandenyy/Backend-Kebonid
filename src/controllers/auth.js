@@ -1,4 +1,4 @@
-const userModel = require('../models/user')
+const userModel = require('../models/auth')
 const JWT = require('jsonwebtoken')
 const uuid = require('uuid/v4')
 const emailRegex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/
@@ -13,7 +13,7 @@ module.exports = {
     const isSeller = false
     const salt = bcrypt.genSaltSync(saltRounds)
     const password = bcrypt.hashSync(req.body.password, salt)
-    const data = { id, email, password, isSeller }
+    const data = { id, email, password, is_seller: isSeller }
     const checkEmail = emailRegex.test(email)
 
     if (checkEmail === true) {
@@ -24,10 +24,9 @@ module.exports = {
               status: 200,
               error: false,
               user: {
-                user_id: userId, 
-                email, 
+                id, 
                 email,
-                role, 
+                isSeller,
               },
               detail: result,
               message: 'Successfully Register New User'
@@ -35,6 +34,9 @@ module.exports = {
           })
         })
         .catch(err => {
+          console.log(email)
+          console.log(password)
+          console.log(err)
           res.status(400).json({
             data: {
               status: 400,
@@ -71,7 +73,7 @@ module.exports = {
                 const id = result.id
                 const email = result.email
                 const isSeller = result.isSeller
-                const token = JWT.sign({ id, email, isSeller }, process.env.SECRET, { expiresIn: '1h' })
+                const token = JWT.sign({ id, email, isSeller }, process.env.SECRET, { expiresIn: '12h' })
 
                 res.status(201).json({
                   data: {
