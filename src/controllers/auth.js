@@ -1,4 +1,5 @@
-const userModel = require('../models/auth')
+const authModel = require('../models/auth')
+const userModel = require('../models/customers')
 const JWT = require('jsonwebtoken')
 const uuid = require('uuid/v4')
 const emailRegex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/
@@ -9,7 +10,7 @@ module.exports = {
 
   register: (req, res) => {
     const id = uuid()
-    const email = req.body.email
+    const { email, name } = req.body
     const isSeller = false
     const salt = bcrypt.genSaltSync(saltRounds)
     const password = bcrypt.hashSync(req.body.password, salt)
@@ -17,20 +18,35 @@ module.exports = {
     const checkEmail = emailRegex.test(email)
 
     if (checkEmail === true) {
-      userModel.register(data)
+      authModel.register(data)
         .then(result => {
-          res.status(200).json({
-            data: {
-              status: 200,
-              error: false,
-              user: {
-                id, 
-                email,
-                isSeller,
+          userModel.createCustomer(id, name)
+          .then(result => {
+            res.status(200).json({
+              data: {
+                status: 200,
+                error: false,
+                user: {
+                  id, 
+                  name,
+                  email,
+                  isSeller,
+                },
+                detail: result,
+                message: 'Successfully Register New User'
               },
-              detail: result,
-              message: 'Successfully Register New User'
-            },
+            })
+          })
+          .catch(err => {
+            console.log(err)
+            res.status(400).json({
+              data: {
+                status: 400,
+                error: true,
+                message: 'Error',
+                detail: err
+              }
+            })
           })
         })
         .catch(err => {
@@ -61,12 +77,12 @@ module.exports = {
     const email = req.body.email
     const password = req.body.password
 
-    userModel.getPassword(email)
+    authModel.getPassword(email)
       .then(result => {
         const hash = result[0].password
         const checkPass = bcrypt.compareSync(password, hash)
         if (checkPass === true) {
-          userModel.getUser(email, hash)
+          authModel.getUser(email, hash)
             .then(result => {
               result = result[0]
               if (result) {
@@ -74,14 +90,14 @@ module.exports = {
                 const email = result.email
                 const isSeller = result.isSeller
                 const token = JWT.sign({ id, email, isSeller }, process.env.SECRET, { expiresIn: '12h' })
-
+                
                 res.status(201).json({
                   data: {
                     status: 201,
                     message: 'Success login',
                     token,
                     user: { id, email, isSeller },
-                    detail: 'This token only valid for 1 hour'
+                    detail: 'This token only valid for 12 hour'
                   }
                 })
               } else {
