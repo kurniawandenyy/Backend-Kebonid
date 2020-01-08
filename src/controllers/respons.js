@@ -5,7 +5,7 @@ module.exports = {
     const resultPrint = {}
     resultPrint.id = uuidv4()
     resultPrint.status = status || 200
-    resultPrint.error = error || false
+    resultPrint.error = error || false,
     resultPrint.message = message || 'Success'
     resultPrint.data = data || {}
 
@@ -15,7 +15,7 @@ module.exports = {
     const resultPrint = {}
     resultPrint.id = uuidv4()
     resultPrint.status = status || 200
-    resultPrint.error = error || false
+    resultPrint.error = error || false,
     resultPrint.message = message || 'Success'
     resultPrint.pageDetail = pageDetail || {}
     resultPrint.data = data || {}
