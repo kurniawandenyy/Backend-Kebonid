@@ -37,7 +37,7 @@ module.exports = {
     const search = req.query.search || ''
     const limit = req.query.limit || 10
     const sort = req.query.sort || 'DESC'
-    const sortBy = req.query.sortBy || 'date_updated'
+    const sortBy = req.query.sortBy || 'name'
     const offset = (page - 1) * limit
 
     let totalDataStore = 0
