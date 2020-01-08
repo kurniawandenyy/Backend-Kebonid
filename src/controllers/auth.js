@@ -24,13 +24,13 @@ module.exports = {
               status: 200,
               error: false,
               user: {
-                id, 
+                id,
                 email,
-                isSeller,
+                isSeller
               },
               detail: result,
               message: 'Successfully Register New User'
-            },
+            }
           })
         })
         .catch(err => {
@@ -48,7 +48,7 @@ module.exports = {
         })
     } else {
       res.status(400).json({
-        data : {
+        data: {
           status: 400,
           error: true,
           message: 'Email not valid'
@@ -119,9 +119,10 @@ module.exports = {
           data: {
             status: 404,
             error: true,
-            message: 'Account not found'
+            message: 'Account not found',
+            err
           }
         })
       })
-  },
+  }
 }
