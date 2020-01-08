@@ -20,5 +20,5 @@ app.use('/api/v1', routerNav)
 
 app.listen(port, (err) => {
   if (err) throw err
-  console.log(' Server is running on Port 8080 . . .')
+  console.log(` Server is running on Port ${port} . . .`)
 })
