@@ -2,7 +2,7 @@ const multer = require('multer')
 const storeModel = require('../models/store')
 const conn = require('../configs/connection')
 const miscHelper = require('./respons')
-
+require('dotenv').config()
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, 'public/images/store')
@@ -114,7 +114,7 @@ module.exports = {
   createStore: (req, res) => {
     upload(req, res, (_err) => {
       const { id, name, phone, address } = req.body
-      const photo = req.file ? `http://localhost:3000/store/${req.file.filename}` : null
+      const photo = req.file ? `${process.env.BASE_URL}/store/${req.file.filename}` : null
       const data = { id, name, photo, phone, address }
       storeModel.createStore(data)
         .then(result => {
@@ -143,10 +143,10 @@ module.exports = {
   // update store
   updateStore: (req, res) => {
     upload(req, res, (_err) => {
-      const { name, description, stock, price } = req.body
+      const { name, phone, address } = req.body
       const id = req.params.id
-      const photo = req.file ? `http://localhost:3000/store/${req.file.filename}` : null
-      const data = { id, name, photo, description, stock, price }
+      const photo = req.file ? `${process.env.BASE_URL}/store/${req.file.filename}` : null
+      const data = { id, name, photo, phone, address }
 
       storeModel.updateStore(id, data)
         .then(result => {
