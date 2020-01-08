@@ -16,12 +16,14 @@ module.exports = {
 
   getPassword: (email) => {
     return new Promise((resolve, reject) => {
-      conn.query("SELECT password FROM users WHERE email='"+email+"'", (err, pass) => {
-        if(!err){
+      conn.query("SELECT password FROM users WHERE email='" + email + "'", (err, pass) => {
+        if (!err) {
           resolve(pass)
-        }else(
-          reject(new Error(err))
-        )
+        } else {
+          (
+            reject(new Error(err))
+          )
+        }
       })
     })
   },

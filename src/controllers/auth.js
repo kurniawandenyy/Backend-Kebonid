@@ -21,33 +21,33 @@ module.exports = {
       authModel.register(data)
         .then(result => {
           userModel.createCustomer(id, name)
-          .then(result => {
-            res.status(200).json({
-              data: {
-                status: 200,
-                error: false,
-                user: {
-                  id, 
-                  name,
-                  email,
-                  isSeller,
-                },
-                detail: result,
-                message: 'Successfully Register New User'
-              },
+            .then(result => {
+              res.status(200).json({
+                data: {
+                  status: 200,
+                  error: false,
+                  user: {
+                    id,
+                    name,
+                    email,
+                    isSeller
+                  },
+                  detail: result,
+                  message: 'Successfully Register New User'
+                }
+              })
             })
-          })
-          .catch(err => {
-            console.log(err)
-            res.status(400).json({
-              data: {
-                status: 400,
-                error: true,
-                message: 'Error',
-                detail: err
-              }
+            .catch(err => {
+              console.log(err)
+              res.status(400).json({
+                data: {
+                  status: 400,
+                  error: true,
+                  message: 'Error',
+                  detail: err
+                }
+              })
             })
-          })
         })
         .catch(err => {
           console.log(email)
@@ -64,7 +64,7 @@ module.exports = {
         })
     } else {
       res.status(400).json({
-        data : {
+        data: {
           status: 400,
           error: true,
           message: 'Email not valid'
@@ -90,7 +90,7 @@ module.exports = {
                 const email = result.email
                 const isSeller = result.isSeller
                 const token = JWT.sign({ id, email, isSeller }, process.env.SECRET, { expiresIn: '12h' })
-                
+
                 res.status(201).json({
                   data: {
                     status: 201,
@@ -131,6 +131,7 @@ module.exports = {
         }
       })
       .catch(err => {
+        console.log(err)
         res.status(404).json({
           data: {
             status: 404,
@@ -139,5 +140,5 @@ module.exports = {
           }
         })
       })
-  },
+  }
 }

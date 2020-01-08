@@ -6,7 +6,7 @@ const fileStorage = multer.diskStorage({
     cb(null, './public/images/customers')
   },
   filename: (req, file, cb) => {
-    cb(null,file.originalname)
+    cb(null, file.originalname)
   }
 })
 
@@ -30,50 +30,50 @@ module.exports = {
     const id = req.params.id
     const { name, phone, address } = req.body
     customersModel.editCustomer(id, name, phone, address)
-    .then(result => {
-      res.status(200).json({
-        data: {
-          id,
-          name,
-          phone,
-          address,
-          message: 'Successfuly Edit a Customers'
-        }
+      .then(result => {
+        res.status(200).json({
+          data: {
+            id,
+            name,
+            phone,
+            address,
+            message: 'Successfuly Edit a Customers'
+          }
+        })
       })
-    })
-    .catch(err => {
-      console.log(err)
-      res.status(400).json({
-        data: {
-          status: 400,
-          error: true,
-          message: 'Email or Password incorect'
-        }
+      .catch(err => {
+        console.log(err)
+        res.status(400).json({
+          data: {
+            status: 400,
+            error: true,
+            message: 'Email or Password incorect'
+          }
+        })
       })
-    })
   },
 
   getCustomerById: (req, res) => {
     const id = req.params.id
     customersModel.getCustomerById(id)
-    .then(result => {
-      res.status(200).json({
-        data: {
-          result,
-          message: 'Successfuly get data Customers by id'
-        }
+      .then(result => {
+        res.status(200).json({
+          data: {
+            result,
+            message: 'Successfuly get data Customers by id'
+          }
+        })
       })
-    })
-    .catch(err => {
-      console.log(err)
-      res.status(400).json({
-        data: {
-          status: 400,
-          error: true,
-          message: 'Error get data Customers by id'
-        }
+      .catch(err => {
+        console.log(err)
+        res.status(400).json({
+          data: {
+            status: 400,
+            error: true,
+            message: 'Error get data Customers by id'
+          }
+        })
       })
-    })
   },
 
   editCustomerPhoto: [upload.single('file'), (req, res) => {
@@ -91,6 +91,7 @@ module.exports = {
         })
       })
       .catch(err => {
+        console.log(err)
         res.status(400).json({
           data: {
             status: 400,
