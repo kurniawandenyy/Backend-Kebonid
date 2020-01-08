@@ -3,6 +3,7 @@ const multer = require('multer')
 const productModel = require('../models/product')
 const conn = require('../configs/connection')
 const miscHelper = require('./respons')
+require('dotenv/config')
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -67,8 +68,8 @@ module.exports = {
             per_page: limit,
             current_page: page,
             total_page: totalPage,
-            nextLink: `${req.originalUrl.replace('page=' + page, 'page=' + nextPage)}`,
-            prevLink: `${req.originalUrl.replace('page=' + page, 'page=' + prevPage)}`,
+            nextLink: process.env.BASE_URL+req.originalUrl.replace('page=' + page, 'page=' + nextPage),
+            prevLink: process.env.BASE_URL+req.originalUrl.replace('page=' + page, 'page=' + prevPage),
             message: 'Success getting all data'
           }
         })
@@ -117,7 +118,7 @@ module.exports = {
       const id = uuidv4() // generate new id
       const dateUpdated = new Date()
       const dateCreated = new Date()
-      const photo = req.file ? `${process.env.BASE_URL}/product/${req.file.filename}` : null
+      const photo = req.file ? req.file.filename : null
       const data = { id, seller_id: sellerId, name, photo, description, stock, price, date_created: dateCreated, date_updated: dateUpdated }
       productModel.createProduct(data)
         .then(result => {
@@ -149,7 +150,7 @@ module.exports = {
       const { name, description, stock, price } = req.body
       const dateUpdated = new Date()
       const id = req.params.id
-      const photo = req.file ? `${process.env.BASE_URL}/product/${req.file.filename}` : null
+      const photo = req.file ? req.file.filename : null
       const data = { id, name, photo, description, stock, price, date_updated: dateUpdated }
       
       productModel.updateProduct(id, data)
