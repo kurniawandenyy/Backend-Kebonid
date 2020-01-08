@@ -4,7 +4,7 @@ const Route = express.Router()
 const auth = require('../controllers/auth')
 
 Route
-    .post('/register', auth.register)
-    .post('/login', auth.login)
+  .post('/register', auth.register)
+  .post('/login', auth.login)
 
-module.exports=Route
+module.exports = Route
