@@ -149,7 +149,7 @@ module.exports = {
       const { name, description, stock, price } = req.body
       const dateUpdated = new Date()
       const id = req.params.id
-      const photo = req.file ? `http://localhost:3000/product/${req.file.filename}` : null
+      const photo = req.file ? `${process.env.BASE_URL}/product/${req.file.filename}` : null
       const data = { id, name, photo, description, stock, price, date_updated: dateUpdated }
 
       productModel.updateProduct(id, data)
