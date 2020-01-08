@@ -66,8 +66,8 @@ module.exports = {
             per_page: limit,
             current_page: page,
             total_page: totalPage,
-            nextLink: `${req.originalUrl.replace('page=' + page, 'page=' + nextPage)}`,
-            prevLink: `${req.originalUrl.replace('page=' + page, 'page=' + prevPage)}`,
+            nextLink: process.env.BASE_URL+req.originalUrl.replace('page=' + page, 'page=' + nextPage),
+            prevLink: process.env.BASE_URL+req.originalUrl.replace('page=' + page, 'page=' + prevPage),
             message: 'Success getting all data'
           }
         })
@@ -114,7 +114,7 @@ module.exports = {
   createStore: (req, res) => {
     upload(req, res, (_err) => {
       const { id, name, phone, address } = req.body
-      const photo = req.file ? `${process.env.BASE_URL}/store/${req.file.filename}` : null
+      const photo = req.file ? req.file.filename : null
       const data = { id, name, photo, phone, address }
       storeModel.createStore(data)
         .then(result => {
@@ -145,7 +145,7 @@ module.exports = {
     upload(req, res, (_err) => {
       const { name, phone, address } = req.body
       const id = req.params.id
-      const photo = req.file ? `${process.env.BASE_URL}/store/${req.file.filename}` : null
+      const photo = req.file ? req.file.filename : null
       const data = { id, name, photo, phone, address }
 
       storeModel.updateStore(id, data)
