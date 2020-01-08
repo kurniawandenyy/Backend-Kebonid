@@ -17,7 +17,7 @@ app.use(function (req, res, next) {
 
 app.use('/api/v1', routerNav)
 
-app.listen(8080, (err) => {
+app.listen(process.env.PORT, (err) => {
   if (err) throw err
-  console.log(' Server is running on Port 8080 . . .')
+  console.log(` Server is running on Port ${process.env.PORT} . . .`)
 })
