@@ -1,4 +1,4 @@
-const conn = require('../configs/connect')
+const conn = require('../configs/connection')
 
 module.exports = {
     getTransactions: (limit, offset, condition) => {
