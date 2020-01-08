@@ -3,6 +3,8 @@ const multer = require('multer')
 const productModel = require('../models/product')
 const conn = require('../configs/connection')
 const miscHelper = require('./respons')
+const redis = require('redis')
+const redisClient = redis.createClient();
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -33,7 +35,7 @@ const upload = multer({
 
 module.exports = {
 
-  getProduct: (req, res) => {
+  getProduct: async (req, res) => {
     const page = parseInt(req.query.page) || 1
     const search = req.query.search || ''
     const limit = req.query.limit || 10
@@ -57,20 +59,22 @@ module.exports = {
 
     productModel.getAll(offset, limit, sort, sortBy, search)
       .then(result => {
+        const data = {
+          status: 200,
+          error: false,
+          source: 'api',
+          data: result,
+          total_data: Math.ceil(totalDataProduct),
+          per_page: limit,
+          current_page: page,
+          total_page: totalPage,
+          nextLink: `${req.originalUrl.replace('page=' + page, 'page=' + nextPage)}`,
+          prevLink: `${req.originalUrl.replace('page=' + page, 'page=' + prevPage)}`,
+          message: 'Success getting all data'
+        }
+        redisClient.setex(req.originalUrl, 3600, JSON.stringify(data));
         res.status(200).json({
-          data: {
-            status: 200,
-            error: false,
-            source: 'api',
-            data: result,
-            total_data: Math.ceil(totalDataProduct),
-            per_page: limit,
-            current_page: page,
-            total_page: totalPage,
-            nextLink: `${req.originalUrl.replace('page=' + page, 'page=' + nextPage)}`,
-            prevLink: `${req.originalUrl.replace('page=' + page, 'page=' + prevPage)}`,
-            message: 'Success getting all data'
-          }
+          data,
         })
       })
       .catch(err => {
@@ -121,6 +125,7 @@ module.exports = {
       const data = { id, seller_id: sellerId, name, photo, description, stock, price, date_created: dateCreated, date_updated: dateUpdated }
       productModel.createProduct(data)
         .then(result => {
+          redisClient.flushdb()
           res.status(201).json({
             data: {
               status: 201,
@@ -132,7 +137,7 @@ module.exports = {
         })
         .catch(err => {
           res.status(400).json({
-            data: {
+            data: { 
               status: 400,
               err: true,
               message: 'failed to add new product',
@@ -153,26 +158,27 @@ module.exports = {
       const data = { id, name, photo, description, stock, price, date_updated: dateUpdated }
 
       productModel.updateProduct(id, data)
-        .then(result => {
-          res.status(201).json({
-            data: {
-              status: 201,
-              err: false,
-              data,
-              message: 'Success updated user'
-            }
-          })
+      .then(result => {
+        redisClient.flushdb()
+        res.status(201).json({
+          data: {
+            status: 201,
+            err: false,
+            data,
+            message: 'Success updated user'
+          }
         })
-        .catch(err => {
-          console.log(err)
-          res.status(400).json({
-            data: {
-              status: 400,
-              err: true,
-              message: 'Failed to updated user'
-            }
-          })
+      })
+      .catch(err => {
+        console.log(err)
+        res.status(400).json({
+          data: {
+            status: 400,
+            err: true,
+            message: 'Failed to updated user'
+          }
         })
+      })
     })
   },
 
@@ -181,6 +187,7 @@ module.exports = {
     const id = req.params.id
     productModel.deleteProduct(id)
       .then(result => {
+        redisClient.flushdb()
         res.status(201).json({
           data: {
             status: 201,
