@@ -1,12 +1,11 @@
-const uuidv4 = require('uuid/v4')
 const multer = require('multer')
-const productModel = require('../models/product')
+const storeModel = require('../models/store')
 const conn = require('../configs/connection')
 const miscHelper = require('./respons')
-
+require('dotenv').config()
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'public/images/product')
+    cb(null, 'public/images/store')
   },
   filename: (req, file, cb) => {
     var filetype = ''
@@ -33,29 +32,29 @@ const upload = multer({
 
 module.exports = {
 
-  getProduct: (req, res) => {
+  getStore: (req, res) => {
     const page = parseInt(req.query.page) || 1
     const search = req.query.search || ''
     const limit = req.query.limit || 10
     const sort = req.query.sort || 'DESC'
-    const sortBy = req.query.sortBy || 'date_updated'
+    const sortBy = req.query.sortBy || 'name'
     const offset = (page - 1) * limit
 
-    let totalDataProduct = 0
+    let totalDataStore = 0
     let totalPage = 0
     let prevPage = 0
     let nextPage = 0
-    conn.query(`SELECT COUNT(*) as data FROM products WHERE (name LIKE '%${search}%')`, (err, res) => {
+    conn.query(`SELECT COUNT(*) as data FROM sellers WHERE (name LIKE '%${search}%')`, (err, res) => {
       if (err) {
         return miscHelper.response(res, 400, true, 'Error', err)
       }
-      totalDataProduct = res[0].data
-      totalPage = totalDataProduct % limit === 0 ? totalDataProduct / limit : Math.floor((totalDataProduct / limit) + 1)
+      totalDataStore = res[0].data
+      totalPage = totalDataStore % limit === 0 ? totalDataStore / limit : Math.floor((totalDataStore / limit) + 1)
       prevPage = page === 1 ? 1 : page - 1
       nextPage = page === totalPage ? totalPage : page + 1
     })
 
-    productModel.getAll(offset, limit, sort, sortBy, search)
+    storeModel.getAll(offset, limit, sort, sortBy, search)
       .then(result => {
         res.status(200).json({
           data: {
@@ -63,7 +62,7 @@ module.exports = {
             error: false,
             source: 'api',
             data: result,
-            total_data: Math.ceil(totalDataProduct),
+            total_data: Math.ceil(totalDataStore),
             per_page: limit,
             current_page: page,
             total_page: totalPage,
@@ -85,9 +84,9 @@ module.exports = {
       })
   },
 
-  getProductById: (req, res) => {
-    const productId = req.params.id
-    productModel.getProductById(productId)
+  getStoreById: (req, res) => {
+    const storeId = req.params.id
+    storeModel.getStoreById(storeId)
       .then(result => {
         res.status(200).json({
           data: {
@@ -100,33 +99,31 @@ module.exports = {
         })
       })
       .catch(err => {
+        console.log(err)
         res.status(400).json({
           data: {
             status: 400,
             error: true,
-            message: 'Failed to get product with this ID',
+            message: 'Failed to get store with this ID',
             detail: err
           }
         })
       })
   },
-  // create Product
-  createProduct: (req, res) => {
+  // create Store
+  createStore: (req, res) => {
     upload(req, res, (_err) => {
-      const { sellerId, name, description, stock, price } = req.body
-      const id = uuidv4() // generate new id
-      const dateUpdated = new Date()
-      const dateCreated = new Date()
-      const photo = req.file ? `${process.env.BASE_URL}/product/${req.file.filename}` : null
-      const data = { id, seller_id: sellerId, name, photo, description, stock, price, date_created: dateCreated, date_updated: dateUpdated }
-      productModel.createProduct(data)
+      const { id, name, phone, address } = req.body
+      const photo = req.file ? `${process.env.BASE_URL}/store/${req.file.filename}` : null
+      const data = { id, name, photo, phone, address }
+      storeModel.createStore(data)
         .then(result => {
           res.status(201).json({
             data: {
               status: 201,
               err: false,
               data,
-              message: 'Success add new product'
+              message: 'Success add new store'
             }
           })
         })
@@ -135,7 +132,7 @@ module.exports = {
             data: {
               status: 400,
               err: true,
-              message: 'failed to add new product',
+              message: 'failed to add new store',
               detail: err
             }
           })
@@ -143,16 +140,15 @@ module.exports = {
     })
   },
 
-  // update Product
-  updateProduct: (req, res) => {
+  // update store
+  updateStore: (req, res) => {
     upload(req, res, (_err) => {
-      const { name, description, stock, price } = req.body
-      const dateUpdated = new Date()
+      const { name, phone, address } = req.body
       const id = req.params.id
-      const photo = req.file ? `${process.env.BASE_URL}/product/${req.file.filename}` : null
-      const data = { id, name, photo, description, stock, price, date_updated: dateUpdated }
-      
-      productModel.updateProduct(id, data)
+      const photo = req.file ? `${process.env.BASE_URL}/store/${req.file.filename}` : null
+      const data = { id, name, photo, phone, address }
+
+      storeModel.updateStore(id, data)
         .then(result => {
           res.status(201).json({
             data: {
@@ -163,7 +159,8 @@ module.exports = {
             }
           })
         })
-        .catch(_err => {
+        .catch(err => {
+          console.log(err)
           res.status(400).json({
             data: {
               status: 400,
@@ -175,16 +172,16 @@ module.exports = {
     })
   },
 
-  // delete product
-  deleteProduct: (req, res) => {
+  // delete store
+  deleteStore: (req, res) => {
     const id = req.params.id
-    productModel.deleteProduct(id)
+    storeModel.deleteStore(id)
       .then(result => {
         res.status(201).json({
           data: {
             status: 201,
             err: false,
-            message: 'Product have been deleted'
+            message: 'Store have been deleted'
           }
         })
       })
@@ -193,7 +190,7 @@ module.exports = {
           data: {
             status: 400,
             err: true,
-            message: 'Failed to deleted product'
+            message: 'Failed to deleted store'
           }
         })
       })
