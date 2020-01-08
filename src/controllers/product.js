@@ -113,12 +113,12 @@ module.exports = {
   // create Product
   createProduct: (req, res) => {
     upload(req, res, (_err) => {
-      const { seller_id, name, description, stock, price } = req.body
+      const { sellerId, name, description, stock, price } = req.body
       const id = uuidv4() // generate new id
-      const date_updated = new Date()
-      const date_created = new Date()
-      const photo = req.file ? `http://localhost:3000/product/${req.file.filename}` : null
-      const data = { id, seller_id, name, photo, description, stock, price, date_created, date_updated }
+      const dateUpdated = new Date()
+      const dateCreated = new Date()
+      const photo = req.file ? `${process.env.BASE_URL}/product/${req.file.filename}` : null
+      const data = { id, seller_id: sellerId, name, photo, description, stock, price, date_created: dateCreated, date_updated: dateUpdated }
       productModel.createProduct(data)
         .then(result => {
           res.status(201).json({
@@ -147,10 +147,10 @@ module.exports = {
   updateProduct: (req, res) => {
     upload(req, res, (_err) => {
       const { name, description, stock, price } = req.body
-      const date_updated = new Date()
+      const dateUpdated = new Date()
       const id = req.params.id
-      const photo = req.file ? `http://localhost:3000/product/${req.file.filename}` : null
-      const data = { id, name, photo, description, stock, price, date_updated }
+      const photo = req.file ? `${process.env.BASE_URL}/product/${req.file.filename}` : null
+      const data = { id, name, photo: photo, description, stock, price, date_updated: dateUpdated }
 
       productModel.updateProduct(id, data)
         .then(result => {
@@ -163,8 +163,7 @@ module.exports = {
             }
           })
         })
-        .catch(err => {
-          console.log(err)
+        .catch(_err => {
           res.status(400).json({
             data: {
               status: 400,
