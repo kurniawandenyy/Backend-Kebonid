@@ -1,5 +1,7 @@
 const model = require('../models/transactions')
 const uuidv4 = require('uuid/v4')
+const redis = require('redis')
+const redisClient = redis.createClient();
 
 module.exports = {
   getTransactions: (req, res) => {
@@ -19,70 +21,80 @@ module.exports = {
       .then(result => {
         const pageTotal = result.dataTotal % limit === 0 ? result.dataTotal / limit : Math.floor((result.dataTotal / limit) + 1)
         if (page > pageTotal || page === 0) {
+          const data= {
+            error: true,
+            message: '404 Page Not Found!',
+            page,
+            limit,
+            totalData: result.dataTotal,
+            totalPage: pageTotal,
+            Total: result.grandtotal,
+            result: result.data
+          }
+          redisClient.setex(req.originalUrl, 3600, JSON.stringify(data));
           return res.status(200).json({
-            data: {
-              error: true,
-              message: '404 Page Not Found!',
-              page,
-              limit,
-              totalData: result.dataTotal,
-              totalPage: pageTotal,
-              Total: result.grandtotal,
-              result: result.data
-            }
+            data
           })
         } else if (page === 1 && pageTotal !== 1) {
+          const data= {
+            error: false,
+            page,
+            nextPage,
+            limit,
+            totalData: result.dataTotal,
+            totalPage: pageTotal,
+            Total: result.grandtotal,
+            result: result.data
+          }
+          redisClient.setex(req.originalUrl, 3600, JSON.stringify(data));
           return res.status(200).json({
-            data: {
-              error: false,
-              page,
-              nextPage,
-              limit,
-              totalData: result.dataTotal,
-              totalPage: pageTotal,
-              Total: result.grandtotal,
-              result: result.data
-            }
+            data
           })
         } else if (page === pageTotal && pageTotal !== 1) {
+          const data= {
+            error: false,
+            page,
+            prevPage,
+            limit,
+            totalData: result.dataTotal,
+            totalPage: pageTotal,
+            Total: result.grandtotal,
+            result: result.data
+          }
+          redisClient.setex(req.originalUrl, 3600, JSON.stringify(data));
           return res.status(200).json({
-            data: {
-              error: false,
-              page,
-              prevPage,
-              limit,
-              totalData: result.dataTotal,
-              totalPage: pageTotal,
-              Total: result.grandtotal,
-              result: result.data
-            }
+            data
           })
         } else if (pageTotal === 1) {
+          const data= {
+            error: false,
+            page,
+            limit,
+            totalData: result.dataTotal,
+            totalPage: pageTotal,
+            Total: result.grandtotal,
+            result: result.data
+          }
+          redisClient.setex(req.originalUrl, 3600, JSON.stringify(data))
           return res.status(200).json({
-            data: {
-              error: false,
-              page,
-              limit,
-              totalData: result.dataTotal,
-              totalPage: pageTotal,
-              Total: result.grandtotal,
-              result: result.data
-            }
+            data
           })
         } else {
           // return miscHelper.response(res, 200, false, 'Success', result)
+          const data= {
+            error: false,
+            page,
+            nextPage,
+            prevPage,
+            limit,
+            totalData: result.dataTotal,
+            totalPage: pageTotal,
+            Total: result.grandtotal,
+            result: result.data
+          }
+          redisClient.setex(req.originalUrl, 3600, JSON.stringify(data));
           return res.status(200).json({
-            data: {
-              error: false,
-              page,
-              nextPage,
-              prevPage,
-              limit,
-              totalData: result.dataTotal,
-              totalPage: pageTotal,
-              Total: result.grandtotal,
-              result: result.data
-            }
+            data
           })
         }
       })
@@ -95,6 +107,7 @@ module.exports = {
 
     model.addTransaction(data)
       .then(result => {
+        redisClient.flushdb()
         res.status(200).json({
           data: {
             error: false,
@@ -116,6 +129,7 @@ module.exports = {
 
     model.deleteTransactions(id)
       .then(result => {
+        redisClient.flushdb()
         res.status(200).json({
           data: {
             error: false,

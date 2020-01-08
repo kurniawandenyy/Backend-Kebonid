@@ -1,8 +1,10 @@
 const express = require('express')
 const Route = express.Router()
 const todoList = require('../controllers/store')
+const checkCache = require('../configs/cache')
+
 Route
-  .get('/', todoList.getStore)
+  .get('/', checkCache, todoList.getStore)
   .get('/:id', todoList.getStoreById)
   .post('/', todoList.createStore)
   .patch('/:id', todoList.updateStore)

@@ -3,6 +3,8 @@ const multer = require('multer')
 const productModel = require('../models/product')
 const conn = require('../configs/connection')
 const miscHelper = require('./respons')
+const redis = require('redis')
+const redisClient = redis.createClient();
 require('dotenv/config')
 
 const storage = multer.diskStorage({
@@ -34,7 +36,7 @@ const upload = multer({
 
 module.exports = {
 
-  getProduct: (req, res) => {
+  getProduct: async (req, res) => {
     const page = parseInt(req.query.page) || 1
     const search = req.query.search || ''
     const limit = req.query.limit || 10
@@ -57,59 +59,55 @@ module.exports = {
     })
 
     productModel.getAll(offset, limit, sort, sortBy, search)
-      .then(result => {
-        res.status(200).json({
-          data: {
-            status: 200,
-            error: false,
-            source: 'api',
-            data: result,
-            total_data: Math.ceil(totalDataProduct),
-            per_page: limit,
-            current_page: page,
-            total_page: totalPage,
-            nextLink: process.env.BASE_URL+req.originalUrl.replace('page=' + page, 'page=' + nextPage),
-            prevLink: process.env.BASE_URL+req.originalUrl.replace('page=' + page, 'page=' + prevPage),
-            message: 'Success getting all data'
-          }
-        })
+    .then(result => {
+      const data = {
+        status: 200,
+        error: false,
+        source: 'api',
+        data: result,
+        total_data: Math.ceil(totalDataProduct),
+        per_page: limit,
+        current_page: page,
+        total_page: totalPage,
+        nextLink: `${req.originalUrl.replace('page=' + page, 'page=' + nextPage)}`,
+        prevLink: `${req.originalUrl.replace('page=' + page, 'page=' + prevPage)}`,
+        message: 'Success getting all data'
+      }
+      redisClient.setex(req.originalUrl, 3600, JSON.stringify(data));
+      res.status(200).json({
+        data,
       })
-      .catch(err => {
-        console.log(err)
-        res.status(400).json({
-          data: {
-            status: 400,
-            error: true,
-            message: 'Data not Found'
-          }
-        })
+    })
+    .catch(err => {
+      console.log(err)
+      res.status(400).json({
+        status: 400,
+        error: true,
+        message: 'Data not Found'
       })
+    })
   },
 
   getProductById: (req, res) => {
     const productId = req.params.id
     productModel.getProductById(productId)
-      .then(result => {
-        res.status(200).json({
-          data: {
-            status: 200,
-            error: false,
-            dataShowed: result.length,
-            data: result,
-            response: 'Data loaded'
-          }
-        })
+    .then(result => {
+      res.status(200).json({
+        status: 200,
+        error: false,
+        dataShowed: result.length,
+        data: result,
+        response: 'Data loaded'
       })
-      .catch(err => {
-        res.status(400).json({
-          data: {
-            status: 400,
-            error: true,
-            message: 'Failed to get product with this ID',
-            detail: err
-          }
-        })
+    })
+    .catch(err => {
+      res.status(400).json({
+        status: 400,
+        error: true,
+        message: 'Failed to get product with this ID',
+        detail: err
       })
+    })
   },
   // create Product
   createProduct: (req, res) => {
@@ -121,26 +119,23 @@ module.exports = {
       const photo = req.file ? req.file.filename : null
       const data = { id, seller_id: sellerId, name, photo, description, stock, price, date_created: dateCreated, date_updated: dateUpdated }
       productModel.createProduct(data)
-        .then(result => {
-          res.status(201).json({
-            data: {
-              status: 201,
-              err: false,
-              data,
-              message: 'Success add new product'
-            }
-          })
+      .then(result => {
+        redisClient.flushdb()
+        res.status(201).json({
+          status: 201,
+          err: false,
+          data,
+          message: 'Success add new product'
         })
-        .catch(err => {
-          res.status(400).json({
-            data: {
-              status: 400,
-              err: true,
-              message: 'failed to add new product',
-              detail: err
-            }
-          })
+      })
+      .catch(err => {
+        res.status(400).json({
+          status: 400,
+          err: true,
+          message: 'failed to add new product',
+          detail: err
         })
+      })
     })
   },
 
@@ -154,25 +149,23 @@ module.exports = {
       const data = { id, name, photo, description, stock, price, date_updated: dateUpdated }
       
       productModel.updateProduct(id, data)
-        .then(result => {
-          res.status(201).json({
-            data: {
-              status: 201,
-              err: false,
-              data,
-              message: 'Success updated user'
-            }
-          })
+      .then(result => {
+        redisClient.flushdb()
+        res.status(201).json({
+          status: 201,
+          err: false,
+          data,
+          message: 'Success updated user'
         })
-        .catch(_err => {
-          res.status(400).json({
-            data: {
-              status: 400,
-              err: true,
-              message: 'Failed to updated user'
-            }
-          })
+      })
+      .catch(err => {
+        console.log(err)
+        res.status(400).json({
+          status: 400,
+          err: true,
+          message: 'Failed to updated user'
         })
+      })
     })
   },
 
@@ -180,23 +173,20 @@ module.exports = {
   deleteProduct: (req, res) => {
     const id = req.params.id
     productModel.deleteProduct(id)
-      .then(result => {
-        res.status(201).json({
-          data: {
-            status: 201,
-            err: false,
-            message: 'Product have been deleted'
-          }
-        })
+    .then(result => {
+      redisClient.flushdb()
+      res.status(201).json({
+        status: 201,
+        err: false,
+        message: 'Product have been deleted'
       })
-      .catch(_err => {
-        res.status(400).json({
-          data: {
-            status: 400,
-            err: true,
-            message: 'Failed to deleted product'
-          }
-        })
+    })
+    .catch(_err => {
+      res.status(400).json({
+        status: 400,
+        err: true,
+        message: 'Failed to deleted product'
       })
+    })
   }
 }
