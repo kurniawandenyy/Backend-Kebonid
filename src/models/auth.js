@@ -63,5 +63,18 @@ module.exports = {
         }
       })
     })
+  },
+
+  update: (id, isSeller) => {
+    return new Promise((resolve, reject) => {
+      const q = "UPDATE users SET is_seller='" + isSeller + "' WHERE id='" + id + "'"
+      conn.query(q, (err, result) => {
+        if (!err) {
+          resolve(result)
+        } else {
+          reject(new Error(err))
+        }
+      })
+    })
   }
 }

@@ -8,5 +8,6 @@ Route
   .post('/login', auth.login)
   .post('/forgot', auth.forgot)
   .post('/reset', auth.reset)
+  .put('/update', auth.update)
 
 module.exports = Route

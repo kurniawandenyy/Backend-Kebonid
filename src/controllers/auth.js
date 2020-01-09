@@ -166,13 +166,13 @@ module.exports = {
             })
             .catch(err_ => {
               res.status(404).json({
-                message: 'error'
+                message: 'error '
               })
             })
         } else {
           console.log('email not found')
           res.status(404).json({
-            message: 'Not OK'
+            message: 'Email not found'
           })
         }
       })
@@ -217,6 +217,23 @@ module.exports = {
         console.log(err)
         res.status(400).json({
           message: 'Not Ok'
+        })
+      })
+  },
+  
+  update: (req, res) => {
+    const { isSeller, id } = req.body
+    authModel.update(id, isSeller)
+      .then(result => {
+        res.status(200).json({
+          message: 'Success update user',
+          result
+        })
+      })
+      .catch(err => {
+        res.status(400).json({
+          message: 'Failed update user',
+          err
         })
       })
   }
