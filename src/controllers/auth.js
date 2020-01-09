@@ -23,49 +23,41 @@ module.exports = {
           userModel.createCustomer(id, name)
             .then(result => {
               res.status(200).json({
-                data: {
-                  status: 200,
-                  error: false,
-                  user: {
-                    id,
-                    name,
-                    email,
-                    isSeller
-                  },
-                  detail: result,
-                  message: 'Successfully Register New User'
-                }
+                status: 200,
+                error: false,
+                user: {
+                  id,
+                  name,
+                  email,
+                  isSeller
+                },
+                detail: result,
+                message: 'Successfully Register New User'
               })
             })
             .catch(err => {
               console.log(err)
               res.status(400).json({
-                data: {
-                  status: 400,
-                  error: true,
-                  message: 'Error',
-                  detail: err
-                }
+                status: 400,
+                error: true,
+                message: 'Error',
+                detail: err
               })
             })
         })
         .catch(err => {
           res.status(400).json({
-            data: {
-              status: 400,
-              error: true,
-              message: 'Email is already registered',
-              detail: err
-            }
+            status: 400,
+            error: true,
+            message: 'Email is already registered',
+            detail: err
           })
         })
     } else {
       res.status(400).json({
-        data: {
-          status: 400,
-          error: true,
-          message: 'Email not valid'
-        }
+        status: 400,
+        error: true,
+        message: 'Email not valid'
       })
     }
   },
@@ -89,52 +81,42 @@ module.exports = {
                 const token = JWT.sign({ id, email, isSeller }, process.env.SECRET, { expiresIn: '12h' })
 
                 res.status(201).json({
-                  data: {
-                    status: 201,
-                    message: 'Success login',
-                    token,
-                    user: { id, email, isSeller },
-                    detail: 'This token only valid for 12 hour'
-                  }
+                  status: 201,
+                  message: 'Success login',
+                  token,
+                  user: { id, email, isSeller },
+                  detail: 'This token only valid for 12 hour'
                 })
               } else {
                 res.status(400).json({
-                  data: {
-                    status: 400,
-                    error: true,
-                    message: 'Email or Password incorect'
-                  }
+                  status: 400,
+                  error: true,
+                  message: 'Email or Password incorect'
                 })
               }
             })
             .catch(err => {
               res.status(400).json({
-                data: {
-                  status: 400,
-                  error: true,
-                  message: 'Login Failed',
-                  detail: err
-                }
+                status: 400,
+                error: true,
+                message: 'Login Failed',
+                detail: err
               })
             })
         } else {
           res.status(400).json({
-            data: {
-              status: 400,
-              error: true,
-              message: 'Wrong Password'
-            }
+            status: 400,
+            error: true,
+            message: 'Wrong Password'
           })
         }
       })
       .catch(err => {
         console.log(err)
         res.status(404).json({
-          data: {
-            status: 404,
-            error: true,
-            message: 'Account not found'
-          }
+          status: 404,
+          error: true,
+          message: 'Account not found'
         })
       })
   }

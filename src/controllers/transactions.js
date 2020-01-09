@@ -1,7 +1,7 @@
 const model = require('../models/transactions')
 const uuidv4 = require('uuid/v4')
 const redis = require('redis')
-const redisClient = redis.createClient();
+const redisClient = redis.createClient()
 
 module.exports = {
   getTransactions: (req, res) => {
@@ -21,7 +21,7 @@ module.exports = {
       .then(result => {
         const pageTotal = result.dataTotal % limit === 0 ? result.dataTotal / limit : Math.floor((result.dataTotal / limit) + 1)
         if (page > pageTotal || page === 0) {
-          const data= {
+          const data = {
             error: true,
             message: '404 Page Not Found!',
             page,
@@ -31,12 +31,12 @@ module.exports = {
             Total: result.grandtotal,
             result: result.data
           }
-          redisClient.setex(req.originalUrl, 3600, JSON.stringify(data));
+          redisClient.setex(req.originalUrl, 3600, JSON.stringify(data))
           return res.status(200).json({
             data
           })
         } else if (page === 1 && pageTotal !== 1) {
-          const data= {
+          const data = {
             error: false,
             page,
             nextPage,
@@ -46,12 +46,12 @@ module.exports = {
             Total: result.grandtotal,
             result: result.data
           }
-          redisClient.setex(req.originalUrl, 3600, JSON.stringify(data));
+          redisClient.setex(req.originalUrl, 3600, JSON.stringify(data))
           return res.status(200).json({
             data
           })
         } else if (page === pageTotal && pageTotal !== 1) {
-          const data= {
+          const data = {
             error: false,
             page,
             prevPage,
@@ -61,12 +61,12 @@ module.exports = {
             Total: result.grandtotal,
             result: result.data
           }
-          redisClient.setex(req.originalUrl, 3600, JSON.stringify(data));
+          redisClient.setex(req.originalUrl, 3600, JSON.stringify(data))
           return res.status(200).json({
             data
           })
         } else if (pageTotal === 1) {
-          const data= {
+          const data = {
             error: false,
             page,
             limit,
@@ -81,7 +81,7 @@ module.exports = {
           })
         } else {
           // return miscHelper.response(res, 200, false, 'Success', result)
-          const data= {
+          const data = {
             error: false,
             page,
             nextPage,
@@ -92,7 +92,7 @@ module.exports = {
             Total: result.grandtotal,
             result: result.data
           }
-          redisClient.setex(req.originalUrl, 3600, JSON.stringify(data));
+          redisClient.setex(req.originalUrl, 3600, JSON.stringify(data))
           return res.status(200).json({
             data
           })
@@ -109,18 +109,14 @@ module.exports = {
       .then(result => {
         redisClient.flushdb()
         res.status(200).json({
-          data: {
-            error: false,
-            result
-          }
+          error: false,
+          result
         })
       })
       .catch(err => {
         res.status(400).json({
-          data: {
-            error: true,
-            err
-          }
+          error: true,
+          err
         })
       })
   },
@@ -131,20 +127,15 @@ module.exports = {
       .then(result => {
         redisClient.flushdb()
         res.status(200).json({
-          data: {
-            error: false,
-            message: result
-          }
+          error: false,
+          message: result
         })
       })
       .catch(err => {
         res.status(400).json({
-          data: {
-            error: true,
-            message: err
-          }
+          error: true,
+          message: err
         })
       })
   }
-
 }
