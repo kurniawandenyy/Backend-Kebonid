@@ -114,7 +114,7 @@ module.exports = {
   createStore: (req, res) => {
     upload(req, res, (_err) => {
       const { id, name, phone, address } = req.body
-      const photo = req.file ? `${process.env.BASE_URL}/store/${req.file.filename}` : null
+      const photo = req.file ? `${req.file.filename}` : null
       const data = { id, name, photo, phone, address }
       storeModel.createStore(data)
         .then(result => {
@@ -145,13 +145,13 @@ module.exports = {
     upload(req, res, (_err) => {
       const { name, phone, address } = req.body
       const id = req.params.id
-      const photo = req.file ? `${process.env.BASE_URL}/store/${req.file.filename}` : null
+      const photo = req.file ? `${req.file.filename}` : null
       const data = { id, name, photo, phone, address }
-      if (photo === null){delete data['photo']}
-      if (!name && !phone && !address){
-        delete data['address']
-        delete data['name']
-        delete data['phone']
+      if (photo === null) { delete data.photo }
+      if (!name && !phone && !address) {
+        delete data.address
+        delete data.name
+        delete data.phone
       }
 
       storeModel.updateStore(id, data)
