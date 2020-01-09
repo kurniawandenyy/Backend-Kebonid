@@ -33,7 +33,14 @@ module.exports = {
           }
           redisClient.setex(req.originalUrl, 3600, JSON.stringify(data))
           return res.status(200).json({
-            data
+            error: true,
+            message: '404 Page Not Found!',
+            page,
+            limit,
+            totalData: result.dataTotal,
+            totalPage: pageTotal,
+            Total: result.grandtotal,
+            result: result.data
           })
         } else if (page === 1 && pageTotal !== 1) {
           const data = {
@@ -48,7 +55,14 @@ module.exports = {
           }
           redisClient.setex(req.originalUrl, 3600, JSON.stringify(data))
           return res.status(200).json({
-            data
+            error: false,
+            page,
+            nextPage,
+            limit,
+            totalData: result.dataTotal,
+            totalPage: pageTotal,
+            Total: result.grandtotal,
+            result: result.data
           })
         } else if (page === pageTotal && pageTotal !== 1) {
           const data = {
@@ -63,7 +77,14 @@ module.exports = {
           }
           redisClient.setex(req.originalUrl, 3600, JSON.stringify(data))
           return res.status(200).json({
-            data
+            error: false,
+            page,
+            prevPage,
+            limit,
+            totalData: result.dataTotal,
+            totalPage: pageTotal,
+            Total: result.grandtotal,
+            result: result.data
           })
         } else if (pageTotal === 1) {
           const data = {
@@ -77,7 +98,13 @@ module.exports = {
           }
           redisClient.setex(req.originalUrl, 3600, JSON.stringify(data))
           return res.status(200).json({
-            data
+            error: false,
+            page,
+            limit,
+            totalData: result.dataTotal,
+            totalPage: pageTotal,
+            Total: result.grandtotal,
+            result: result.data
           })
         } else {
           // return miscHelper.response(res, 200, false, 'Success', result)
@@ -94,7 +121,15 @@ module.exports = {
           }
           redisClient.setex(req.originalUrl, 3600, JSON.stringify(data))
           return res.status(200).json({
-            data
+            error: false,
+            page,
+            nextPage,
+            prevPage,
+            limit,
+            totalData: result.dataTotal,
+            totalPage: pageTotal,
+            Total: result.grandtotal,
+            result: result.data
           })
         }
       })

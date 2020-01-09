@@ -75,7 +75,17 @@ module.exports = {
         }
         redisClient.setex(req.originalUrl, 3600, JSON.stringify(data))
         res.status(200).json({
-          data
+          status: 200,
+          error: false,
+          source: 'api',
+          data: result,
+          total_data: Math.ceil(totalDataProduct),
+          per_page: limit,
+          current_page: page,
+          total_page: totalPage,
+          nextLink: `${req.originalUrl.replace('page=' + page, 'page=' + nextPage)}`,
+          prevLink: `${req.originalUrl.replace('page=' + page, 'page=' + prevPage)}`,
+          message: 'Success getting all data'
         })
       })
       .catch(err => {
