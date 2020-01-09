@@ -38,5 +38,30 @@ module.exports = {
         }
       })
     })
+  },
+
+  getEmail: (email) => {
+    return new Promise((resolve, reject) => {
+      conn.query("SELECT * FROM users WHERE email='" + email + "'", (err, result) => {
+        if (!err) {
+          resolve(result)
+        } else {
+          reject(new Error(err))
+        }
+      })
+    })
+  },
+
+  changePassword: (email, password) => {
+    return new Promise((resolve, reject) => {
+      const q = "UPDATE users SET password='" + password + "' WHERE email='" + email + "'"
+      conn.query(q, (err, result) => {
+        if (!err) {
+          resolve(result)
+        } else {
+          reject(new Error(err))
+        }
+      })
+    })
   }
 }
