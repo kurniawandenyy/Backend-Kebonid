@@ -34,7 +34,7 @@ module.exports = {
           console.log(id)
           console.log(decoded.id)
           return res.status(403).json({
-            status: 403,  
+            status: 403,
             error: true,
             message: 'Your email or user id not match with token'
           })
@@ -48,5 +48,5 @@ module.exports = {
         message: 'Token is Invalid'
       })
     }
-  },
+  }
 }

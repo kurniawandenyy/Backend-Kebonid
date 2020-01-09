@@ -13,7 +13,7 @@ module.exports = {
       })
     })
   },
-  
+
   getCart: (customerId) => {
     return new Promise((resolve, reject) => {
       const q = `SELECT *, (amount*price) as sub_total FROM cart WHERE customer_id="${customerId}"`
@@ -36,7 +36,7 @@ module.exports = {
 
   deleteCart: (customerId) => {
     return new Promise((resolve, reject) => {
-      const q = 'DELETE FROM cart WHERE id="'+customerId+'"'
+      const q = 'DELETE FROM cart WHERE id="' + customerId + '"'
       conn.query(q, (err, result) => {
         if (!err) {
           resolve(result)
@@ -45,5 +45,5 @@ module.exports = {
         }
       })
     })
-  },
+  }
 }

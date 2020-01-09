@@ -3,7 +3,7 @@ const storeModel = require('../models/store')
 const conn = require('../configs/connection')
 const miscHelper = require('./respons')
 const redis = require('redis')
-const redisClient = redis.createClient();
+const redisClient = redis.createClient()
 require('dotenv').config()
 
 const storage = multer.diskStorage({
@@ -59,7 +59,7 @@ module.exports = {
 
     storeModel.getAll(offset, limit, sort, sortBy, search)
       .then(result => {
-        const data= {
+        const data = {
           status: 200,
           error: false,
           source: 'api',
@@ -68,13 +68,13 @@ module.exports = {
           per_page: limit,
           current_page: page,
           total_page: totalPage,
-          nextLink: process.env.BASE_URL+req.originalUrl.replace('page=' + page, 'page=' + nextPage),
-          prevLink: process.env.BASE_URL+req.originalUrl.replace('page=' + page, 'page=' + prevPage),
+          nextLink: process.env.BASE_URL + req.originalUrl.replace('page=' + page, 'page=' + nextPage),
+          prevLink: process.env.BASE_URL + req.originalUrl.replace('page=' + page, 'page=' + prevPage),
           message: 'Success getting all data'
         }
-        redisClient.setex(req.originalUrl, 3600, JSON.stringify(data));
+        redisClient.setex(req.originalUrl, 3600, JSON.stringify(data))
         res.status(200).json({
-          data,
+          data
         })
       })
       .catch(err => {

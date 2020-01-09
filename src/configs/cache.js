@@ -1,19 +1,19 @@
 const redis = require('redis')
-const redisClient = redis.createClient();
+const redisClient = redis.createClient()
 
-checkCache = (req, res, next) => {
+const checkCache = (req, res, next) => {
   redisClient.get(req.originalUrl, (err, data) => {
     if (err) {
-      console.log(err);
-      res.status(500).send(err);
+      console.log(err)
+      res.status(500).send(err)
     }
 
     if (data != null) {
-      res.send(data);
+      res.send(data)
     } else {
-      next();
+      next()
     }
-  });
-};
+  })
+}
 
-module.exports = checkCache;
+module.exports = checkCache
