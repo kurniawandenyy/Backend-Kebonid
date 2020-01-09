@@ -45,7 +45,7 @@ module.exports = {
     let totalPage = 0
     let prevPage = 0
     let nextPage = 0
-    conn.query(`SELECT COUNT(*) as data FROM products WHERE (name LIKE '%${search}%')`, (err, res) => {
+    conn.query(`SELECT COUNT(*) as data FROM products WHERE (name LIKE '%${search}%' or seller_id LIKE '%${search}%')`, (err, res) => {
       if (err) {
         return miscHelper.response(res, 400, true, 'Error', err)
       }
