@@ -150,7 +150,14 @@ module.exports = {
       const dateUpdated = new Date()
       const id = req.params.id
       const photo = req.file ? `${process.env.BASE_URL}/product/${req.file.filename}` : null
-      const data = { id, name, photo: photo, description, stock, price, date_updated: dateUpdated }
+      const data = { id, name, photo, description, stock, price, date_updated: dateUpdated }
+      if (photo === null) {delete data['photo']}
+      if (!name && !description && !price) {
+        delete data['name']
+        delete data['description']
+        delete data['price']
+      }
+      if (!stock){delete data['stock']}
 
       productModel.updateProduct(id, data)
         .then(result => {
