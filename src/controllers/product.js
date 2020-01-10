@@ -115,7 +115,7 @@ module.exports = {
           status: 400,
           error: true,
           message: 'Failed to get product with this ID',
-          detail: err
+          detail: err.message
         })
       })
   },
