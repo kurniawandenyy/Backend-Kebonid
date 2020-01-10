@@ -154,6 +154,12 @@ module.exports = {
       const id = req.params.id
       const photo = req.file ? req.file.filename : null
       const data = { id, name, photo, phone, address }
+      if (photo === null) { delete data.photo }
+      if (!name && !phone && !address) {
+        delete data.address
+        delete data.name
+        delete data.phone
+      }
 
       storeModel.updateStore(id, data)
         .then(result => {

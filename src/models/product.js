@@ -3,7 +3,7 @@ const conn = require('../configs/connection')
 module.exports = {
   getAll: (offset, limit, sort, sortBy, search) => {
     return new Promise((resolve, reject) => {
-      const sql = `SELECT * FROM products WHERE (name LIKE '%${search}%') 
+      const sql = `SELECT * FROM products WHERE (name LIKE '%${search}%' or seller_id LIKE '%${search}%') 
           ORDER BY ${sortBy} ${sort} LIMIT ${offset}, ${limit}`
 
       conn.query(sql, (err, result) => {

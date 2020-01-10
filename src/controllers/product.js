@@ -48,7 +48,7 @@ module.exports = {
     let totalPage = 0
     let prevPage = 0
     let nextPage = 0
-    conn.query(`SELECT COUNT(*) as data FROM products WHERE (name LIKE '%${search}%')`, (err, res) => {
+    conn.query(`SELECT COUNT(*) as data FROM products WHERE (name LIKE '%${search}%' or seller_id LIKE '%${search}%')`, (err, res) => {
       if (err) {
         return miscHelper.response(res, 400, true, 'Error', err)
       }
@@ -127,6 +127,7 @@ module.exports = {
       const dateUpdated = new Date()
       const dateCreated = new Date()
       const photo = req.file ? req.file.filename : null
+      
       const data = { id, seller_id: sellerId, name, photo, description, stock, price, date_created: dateCreated, date_updated: dateUpdated }
       productModel.createProduct(data)
         .then(result => {
@@ -155,9 +156,17 @@ module.exports = {
       const { name, description, stock, price } = req.body
       const dateUpdated = new Date()
       const id = req.params.id
+      
       const photo = req.file ? req.file.filename : null
       const data = { id, name, photo, description, stock, price, date_updated: dateUpdated }
-
+      if (photo === null) { delete data.photo }
+      if (!name && !description && !price) {
+        delete data.name
+        delete data.description
+        delete data.price
+      }
+      if (!stock) { delete data.stock }
+      
       productModel.updateProduct(id, data)
         .then(result => {
           redisClient.flushdb()
