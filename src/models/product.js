@@ -18,7 +18,7 @@ module.exports = {
 
   getProductById: (productId) => {
     return new Promise((resolve, reject) => {
-      const sql = "SELECT * FROM products WHERE id='" + productId + "'"
+      const sql = "SELECT products.id, sellers.id, products.name, products.photo, products.description, products.stock, products.price, sellers.name, sellers.photo, sellers.phone, sellers.address FROM products INNER JOIN sellers ON products.seller_id=sellers.id WHERE products.id='" + productId + "'"
       conn.query(sql, (err, result) => {
         if (!err) {
           resolve(result)
