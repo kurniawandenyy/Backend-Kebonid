@@ -32,23 +32,19 @@ module.exports = {
     customersModel.editCustomer(id, name, phone, address)
       .then(result => {
         res.status(200).json({
-          data: {
-            id,
-            name,
-            phone,
-            address,
-            message: 'Successfuly Edit a Customers'
-          }
+          id,
+          name,
+          phone,
+          address,
+          message: 'Successfuly Edit a Customers'
         })
       })
       .catch(err => {
         console.log(err)
         res.status(400).json({
-          data: {
-            status: 400,
-            error: true,
-            message: 'Email or Password incorect'
-          }
+          status: 400,
+          error: true,
+          message: 'Email or Password incorect'
         })
       })
   },
@@ -58,20 +54,16 @@ module.exports = {
     customersModel.getCustomerById(id)
       .then(result => {
         res.status(200).json({
-          data: {
-            result,
-            message: 'Successfuly get data Customers by id'
-          }
+          result,
+          message: 'Successfuly get data Customers by id'
         })
       })
       .catch(err => {
         console.log(err)
         res.status(400).json({
-          data: {
-            status: 400,
-            error: true,
-            message: 'Error get data Customers by id'
-          }
+          status: 400,
+          error: true,
+          message: 'Error get data Customers by id'
         })
       })
   },
@@ -82,22 +74,18 @@ module.exports = {
     customersModel.editCustomerPhoto(fileName, id)
       .then(result => {
         res.status(200).json({
-          data: {
-            status: 200,
-            error: false,
-            data: result,
-            message: 'Successfully update data'
-          }
+          status: 200,
+          error: false,
+          data: result,
+          message: 'Successfully update data'
         })
       })
       .catch(err => {
         console.log(err)
         res.status(400).json({
-          data: {
-            status: 400,
-            error: true,
-            message: 'Error update data'
-          }
+          status: 400,
+          error: true,
+          message: 'Error update data'
         })
       })
   }]
