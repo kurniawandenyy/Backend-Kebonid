@@ -27,6 +27,34 @@ module.exports = {
       })
     })
   },
+
+  getLatestTransactions: (id) => {
+    return new Promise((resolve, reject) => {
+      conn.query(`SELECT COUNT(*) as data from transaction WHERE group_id="${id}"`, (err, rows) => {
+        if (err) {
+          reject(new Error(err))
+        } else {
+          const dataTotal = rows[0].data
+          conn.query(`SELECT *, (amount*price) as sub_total FROM transaction WHERE group_id="${id}"`, (err, data) => {
+            if (!err) {
+              conn.query(`SELECT sum(amount*price) as total, transaction_date FROM transaction WHERE group_id="${id}"`, (err, total) => {
+                if (err) {
+                  reject(new Error(err))
+                } else {
+                  const grandtotal = total
+                  const result = { dataTotal, data, grandtotal }
+                  resolve(result)
+                }
+              })
+            } else {
+              reject(new Error(err))
+            }
+          })
+        }
+      })
+    })
+  },
+
   addTransaction: (data) => {
     return new Promise((resolve, reject) => {
       conn.query('INSERT INTO transaction SET ?', data, (err, result) => {

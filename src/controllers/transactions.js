@@ -134,27 +134,43 @@ module.exports = {
         }
       })
   },
-  addTransaction: (req, res) => {
-    const id = uuidv4()
-    const { customerId, productId, productName, amount, price, status } = req.body
-    const transactionDate = new Date()
-    const data = { id, customer_id: customerId, product_id: productId, product_name: productName, amount, price, status, transaction_date: transactionDate }
 
-    model.addTransaction(data)
+  getLatestTransactions: (req, res) => {
+    const id = req.params.id
+    model.getLatestTransactions(id)
       .then(result => {
-        redisClient.flushdb()
-        res.status(200).json({
-          error: false,
-          result
+        console.log(result)
+          res.status(200).json({
+            error: false,
+            totalData: result.dataTotal,
+            Total: result.grandtotal,
+            result: result.data
+          })
         })
-      })
       .catch(err => {
         res.status(400).json({
           error: true,
-          err
+          err: err.message
         })
       })
   },
+
+  addTransaction: (req, res) => {
+    const transactionDate = new Date()
+    const idGroup = uuidv4()
+    req.body.map(data => {
+      console.log(data.amount)
+      const id = uuidv4()
+      const d = { id, customer_id: data.customerId, product_id: data.productId, product_name: data.productName, amount: data.amount, price: data.price, status: data.status, transaction_date: transactionDate, group_id: idGroup }
+      model.addTransaction(d)
+    })
+      redisClient.flushdb()
+      res.status(200).json({
+        error: false,
+        message: "Sucessfully add new transaction"
+      })
+  },
+
   deleteTransaction: (req, res) => {
     const id = req.params.id
 
