@@ -48,6 +48,24 @@ module.exports = {
       })
   },
 
+  getAllWishlist: (req, res) => {
+    wishlistModel.getAllWishlist()
+      .then(result => {
+        res.status(200).json({
+          result,
+          message: 'Successfully get all wishlist'
+        })
+      })
+      .catch(err => {
+        console.log(err)
+        res.status(400).json({
+          status: 400,
+          error: true,
+          message: 'Error get wishlist'
+        })
+      })
+  },
+
   deleteWishlist: (req, res) => {
     wishlistModel.deleteWishlist(req.params.id)
       .then(result => {
