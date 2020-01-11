@@ -2,7 +2,10 @@ const multer = require('multer')
 const storeModel = require('../models/store')
 const conn = require('../configs/connection')
 const miscHelper = require('./respons')
+const redis = require('redis')
+const redisClient = redis.createClient()
 require('dotenv').config()
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, 'public/images/store')
@@ -56,30 +59,40 @@ module.exports = {
 
     storeModel.getAll(offset, limit, sort, sortBy, search)
       .then(result => {
+        const data = {
+          status: 200,
+          error: false,
+          source: 'api',
+          data: result,
+          total_data: Math.ceil(totalDataStore),
+          per_page: limit,
+          current_page: page,
+          total_page: totalPage,
+          nextLink: process.env.BASE_URL + req.originalUrl.replace('page=' + page, 'page=' + nextPage),
+          prevLink: process.env.BASE_URL + req.originalUrl.replace('page=' + page, 'page=' + prevPage),
+          message: 'Success getting all data'
+        }
+        redisClient.setex(req.originalUrl, 3600, JSON.stringify(data))
         res.status(200).json({
-          data: {
-            status: 200,
-            error: false,
-            source: 'api',
-            data: result,
-            total_data: Math.ceil(totalDataStore),
-            per_page: limit,
-            current_page: page,
-            total_page: totalPage,
-            nextLink: process.env.BASE_URL+req.originalUrl.replace('page=' + page, 'page=' + nextPage),
-            prevLink: process.env.BASE_URL+req.originalUrl.replace('page=' + page, 'page=' + prevPage),
-            message: 'Success getting all data'
-          }
+          status: 200,
+          error: false,
+          source: 'api',
+          data: result,
+          total_data: Math.ceil(totalDataStore),
+          per_page: limit,
+          current_page: page,
+          total_page: totalPage,
+          nextLink: process.env.BASE_URL + req.originalUrl.replace('page=' + page, 'page=' + nextPage),
+          prevLink: process.env.BASE_URL + req.originalUrl.replace('page=' + page, 'page=' + prevPage),
+          message: 'Success getting all data'
         })
       })
       .catch(err => {
         console.log(err)
         res.status(400).json({
-          data: {
-            status: 400,
-            error: true,
-            message: 'Data not Found'
-          }
+          status: 400,
+          error: true,
+          message: 'Data not Found'
         })
       })
   },
@@ -88,25 +101,22 @@ module.exports = {
     const storeId = req.params.id
     storeModel.getStoreById(storeId)
       .then(result => {
+        redisClient.flushdb()
         res.status(200).json({
-          data: {
-            status: 200,
-            error: false,
-            dataShowed: result.length,
-            data: result,
-            response: 'Data loaded'
-          }
+          status: 200,
+          error: false,
+          dataShowed: result.length,
+          data: result,
+          response: 'Data loaded'
         })
       })
       .catch(err => {
         console.log(err)
         res.status(400).json({
-          data: {
-            status: 400,
-            error: true,
-            message: 'Failed to get store with this ID',
-            detail: err
-          }
+          status: 400,
+          error: true,
+          message: 'Failed to get store with this ID',
+          detail: err
         })
       })
   },
@@ -118,23 +128,20 @@ module.exports = {
       const data = { id, name, photo, phone, address }
       storeModel.createStore(data)
         .then(result => {
+          redisClient.flushdb()
           res.status(201).json({
-            data: {
-              status: 201,
-              err: false,
-              data,
-              message: 'Success add new store'
-            }
+            status: 201,
+            err: false,
+            data,
+            message: 'Success add new store'
           })
         })
         .catch(err => {
           res.status(400).json({
-            data: {
-              status: 400,
-              err: true,
-              message: 'failed to add new store',
-              detail: err
-            }
+            status: 400,
+            err: true,
+            message: 'failed to add new store',
+            detail: err
           })
         })
     })
@@ -147,26 +154,29 @@ module.exports = {
       const id = req.params.id
       const photo = req.file ? req.file.filename : null
       const data = { id, name, photo, phone, address }
+      if (photo === null) { delete data.photo }
+      if (!name && !phone && !address) {
+        delete data.address
+        delete data.name
+        delete data.phone
+      }
 
       storeModel.updateStore(id, data)
         .then(result => {
+          redisClient.flushdb()
           res.status(201).json({
-            data: {
-              status: 201,
-              err: false,
-              data,
-              message: 'Success updated user'
-            }
+            status: 201,
+            err: false,
+            data,
+            message: 'Success updated user'
           })
         })
         .catch(err => {
           console.log(err)
           res.status(400).json({
-            data: {
-              status: 400,
-              err: true,
-              message: 'Failed to updated user'
-            }
+            status: 400,
+            err: true,
+            message: 'Failed to updated user'
           })
         })
     })
@@ -177,21 +187,18 @@ module.exports = {
     const id = req.params.id
     storeModel.deleteStore(id)
       .then(result => {
+        redisClient.flushdb()
         res.status(201).json({
-          data: {
-            status: 201,
-            err: false,
-            message: 'Store have been deleted'
-          }
+          status: 201,
+          err: false,
+          message: 'Store have been deleted'
         })
       })
       .catch(_err => {
         res.status(400).json({
-          data: {
-            status: 400,
-            err: true,
-            message: 'Failed to deleted store'
-          }
+          status: 400,
+          err: true,
+          message: 'Failed to deleted store'
         })
       })
   }

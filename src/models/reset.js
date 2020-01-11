@@ -2,9 +2,10 @@ const conn = require('../configs/connection')
 
 module.exports = {
 
-  createWishlist: (data) => {
+  createReset: (id, email, otp) => {
     return new Promise((resolve, reject) => {
-      conn.query('INSERT INTO wishlist SET ?', data, (err, result) => {
+      const data = { id, email, otp }
+      conn.query('INSERT INTO reset_password SET ?', data, (err, result) => {
         if (!err) {
           resolve(result)
         } else {
@@ -14,22 +15,22 @@ module.exports = {
     })
   },
 
-  getWishlist: (customerId) => {
+  getReset: (otp) => {
     return new Promise((resolve, reject) => {
-      const q = 'SELECT wishlist.id, products.id as product_id, wishlist.customer_id, products.seller_id, products.name, products.photo, products.description, products.stock, products.price FROM wishlist INNER JOIN products ON wishlist.product_id = products.id WHERE customer_id="'+customerId+'"'
+      conn.query('SELECT * FROM reset_password WHERE otp="' + otp + '"', (err, result) => {
+        if (!err) {
+          resolve(result)
+        } else {
+          reject(new Error(err))
+        }
+      })
+    })
+  },
+
+  deleteReset: (email) => {
+    return new Promise((resolve, reject) => {
+      const q = 'DELETE FROM reset_password WHERE email="' + email + '"'
       conn.query(q, (err, result) => {
-        if (!err) {
-          resolve(result)
-        } else {
-          reject(new Error(err))
-        }
-      })
-    })
-  },
-
-  deleteWishlist: (id) => {
-    return new Promise((resolve, reject) => {
-      conn.query('DELETE FROM wishlist WHERE id="' + id + '"', (err, result) => {
         if (!err) {
           resolve(result)
         } else {

@@ -7,18 +7,14 @@ module.exports = {
     model.getMessage(id)
       .then(result => {
         return res.status(200).json({
-          data: {
-            error: false,
-            result
-          }
+          error: false,
+          result
         })
       })
       .catch(err => {
         return res.status(400).json({
-          data: {
-            error: true,
-            err
-          }
+          error: true,
+          err
         })
       })
   },
@@ -31,18 +27,14 @@ module.exports = {
     model.addMessage(data)
       .then(result => {
         return res.status(200).json({
-          data: {
-            error: false,
-            result
-          }
+          error: false,
+          result
         })
       })
       .catch(err => {
         return res.status(400).json({
-          data: {
-            error: true,
-            err
-          }
+          error: true,
+          err
         })
       })
   }
