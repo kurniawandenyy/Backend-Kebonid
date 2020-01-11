@@ -167,7 +167,8 @@ module.exports = {
       redisClient.flushdb()
       res.status(200).json({
         error: false,
-        message: "Sucessfully add new transaction"
+        message: "Sucessfully add new transaction",
+        idGroup
       })
   },
 
