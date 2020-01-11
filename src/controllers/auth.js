@@ -88,7 +88,7 @@ module.exports = {
               if (result) {
                 const id = result.id
                 const email = result.email
-                const isSeller = result.isSeller
+                const isSeller = result.is_seller
                 const token = JWT.sign({ id, email, isSeller }, process.env.SECRET, { expiresIn: '12h' })
 
                 res.status(201).json({
