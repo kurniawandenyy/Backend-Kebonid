@@ -58,7 +58,7 @@ module.exports = {
 
   deleteProduct: (id) => {
     return new Promise((resolve, reject) => {
-      const sql = "DELETE FROM products WHERE id='" + id + "'"
+      const sql = "DELETE FROM products WHERE sid='" + id + "'" 
       conn.query(sql, (err, result) => {
         if (!err) {
           resolve(result)

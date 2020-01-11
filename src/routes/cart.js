@@ -7,5 +7,6 @@ Route
   .post('/', cart.createCart)
   .get('/:id', cart.getCart)
   .delete('/:id', cart.deleteCart)
+  .put('/:id', cart.updateCart)
 
 module.exports = Route

@@ -153,7 +153,7 @@ module.exports = {
               transporter.sendMail(mailOptions, (err, info) => {
                 if (err) {
                   console.log(err)
-                  res.send('email failed')
+                  res.send(err.message)
                 } else {
                   res.status(200).json({
                     status: 200,
@@ -220,7 +220,7 @@ module.exports = {
         })
       })
   },
-  
+
   update: (req, res) => {
     const { isSeller, id } = req.body
     authModel.update(id, isSeller)

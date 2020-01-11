@@ -1,5 +1,6 @@
 const multer = require('multer')
 const storeModel = require('../models/store')
+const authModel = require('../models/auth')
 const conn = require('../configs/connection')
 const miscHelper = require('./respons')
 const redis = require('redis')
@@ -56,7 +57,6 @@ module.exports = {
       prevPage = page === 1 ? 1 : page - 1
       nextPage = page === totalPage ? totalPage : page + 1
     })
-
     storeModel.getAll(offset, limit, sort, sortBy, search)
       .then(result => {
         const data = {
@@ -126,25 +126,37 @@ module.exports = {
       const { id, name, phone, address } = req.body
       const photo = req.file ? req.file.filename : null
       const data = { id, name, photo, phone, address }
+      
       storeModel.createStore(data)
         .then(result => {
           redisClient.flushdb()
-          res.status(201).json({
-            status: 201,
-            err: false,
-            data,
-            message: 'Success add new store'
+          authModel.update(data.id,1)
+          .then(res_ =>{
+            res.status(201).json({
+              status: 201,
+              err: false,
+              data,
+              message: 'Success creted store'
+            })
+          })
+          .catch(err => {
+            console.log(err)
+            res.status(400).json({
+              status: 400,
+              err: true,
+              message: 'Failed to created store'
+            })
           })
         })
         .catch(err => {
+          console.log(err)
           res.status(400).json({
             status: 400,
             err: true,
-            message: 'failed to add new store',
-            detail: err
+            message: 'Failed to created store'
           })
         })
-    })
+      })
   },
 
   // update store
@@ -179,7 +191,7 @@ module.exports = {
             message: 'Failed to updated user'
           })
         })
-    })
+      })
   },
 
   // delete store
@@ -188,6 +200,7 @@ module.exports = {
     storeModel.deleteStore(id)
       .then(result => {
         redisClient.flushdb()
+        authModel.update(id, 0).then(res_ =>{
         res.status(201).json({
           status: 201,
           err: false,
@@ -201,5 +214,14 @@ module.exports = {
           message: 'Failed to deleted store'
         })
       })
+    })
+    .catch(err => {
+      console.log(err)
+      res.status(400).json({
+        status: 400,
+        err: true,
+        message: 'Failed to updated user'
+      })
+    })
   }
 }

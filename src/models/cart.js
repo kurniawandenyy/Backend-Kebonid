@@ -45,5 +45,18 @@ module.exports = {
         }
       })
     })
+  },
+
+  updateCart: (id, amount) => {
+    return new Promise((resolve, reject) => {
+      const q = `UPDATE cart SET amount="${amount}" WHERE id="${id}"`
+      conn.query(q, (err, result) => {
+        if (!err) {
+          resolve(result)
+        } else {
+          reject(new Error(err))
+        }
+      })
+    })
   }
 }

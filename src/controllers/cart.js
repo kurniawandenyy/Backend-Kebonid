@@ -65,5 +65,30 @@ module.exports = {
           message: 'Error delete cart'
         })
       })
+  },
+
+  updateCart: (req, res) => {
+    const amount = req.body.amount
+    const id = req.params.id
+    cartModel.updateCart(id, amount)
+      .then(result => {
+        res.status(200).json({
+          status: 200,
+          error: false,
+          result,
+          cart: {
+            amount
+          }
+        })
+      })
+      .catch(err => {
+        console.log(err)
+        res.status(400).json({
+          status: 400,
+          error: true,
+          message: 'Error update cart',
+          detail: err.message
+        })
+      })
   }
 }
