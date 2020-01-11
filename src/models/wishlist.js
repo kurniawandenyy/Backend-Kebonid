@@ -29,7 +29,7 @@ module.exports = {
 
   getAllWishlist: () => {
     return new Promise((resolve, reject) => {
-      const q = 'SELECT wishlist.id, wishlist.customer_id, products.seller_id, products.name, products.photo, products.description, products.stock, products.price FROM wishlist INNER JOIN products ON wishlist.product_id = products.id'
+      const q = 'SELECT wishlist.id, products.id as product_id, wishlist.customer_id, products.seller_id, products.name, products.photo, products.description, products.stock, products.price FROM wishlist INNER JOIN products ON wishlist.product_id = products.id'
       conn.query(q, (err, result) => {
         if (!err) {
           resolve(result)
