@@ -1,5 +1,7 @@
 <h1 align="center">Backend - Kebon.id</h1>
-
+<p align="center">
+  <img width="250" src="https://raw.githubusercontent.com/AdmiralYuuShi/Frontend-Kebonid/master/src/assets/logo_transparent.png"/>
+</p>
 
 
 Kebon.id is a backend for Kebon.id frontend application. Built with NodeJs using the ExpressJs Framework.
