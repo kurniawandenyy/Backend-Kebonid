@@ -97,7 +97,7 @@ SECRET=[jwt_secret_key]
 
 ## Related Project
 
-- [`Frontend-Kebonid`](https://github.com/AdmiralYuuShi/Frontend-Kebonid)
+- [`Frontend-Kebonid`](https://github.com/kurniawandenyy/Frontend-Kebonid)
 
 ## Contributors
 
